@@ -20,13 +20,15 @@ class ConfigProvider implements ConfigProviderInterface
     public function getAxleusSettings(): array
     {
         return [
-            Adapter\AdapterInterface::class => [
-                'host'      => '127.0.0.1',
-                'smtp_auth' => true,
-                'port'      => 25,
-                'username'  => '',
-                'password'  => '',
-                'from' => 'registration@masteringmezzio.com',
+            static::class => [
+                Adapter\AdapterInterface::class => [
+                    'host'      => '127.0.0.1',
+                    'smtp_auth' => true,
+                    'port'      => 25,
+                    'username'  => '',
+                    'password'  => '',
+                    'from' => 'registration@example.com',
+                ],
             ],
         ];
     }
