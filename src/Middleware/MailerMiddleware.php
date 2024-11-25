@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer\Middleware;
 
-use Axleus\Mailer\Adapter\AdapterInterface;
-use Axleus\Mailer\ConfigProvider;
 use Axleus\Mailer\MailerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,15 +23,8 @@ class MailerMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (! empty($this->config[ConfigProvider::class][AdapterInterface::class])) {
-            $config = $this->config[ConfigProvider::class][AdapterInterface::class];
-        }
         $adapter = $this->mailer->getAdapter();
-        // $serverParams = $request->getServerParams();
-        // $host         = $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'];
-
-        $adapter->from($config[static::FROM_ADDRESS_KEY]);
-
+        $adapter->from($this->config[static::FROM_ADDRESS_KEY]);
         return $handler->handle($request->withAttribute(MailerInterface::class, $this->mailer));
     }
 }
