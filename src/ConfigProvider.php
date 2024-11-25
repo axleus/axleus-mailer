@@ -4,21 +4,30 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer;
 
-class ConfigProvider
+use Axleus\Core\ConfigProviderInterface;
+
+class ConfigProvider implements ConfigProviderInterface
 {
     public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates'    => $this->getTemplates(),
-            static::class  => $this->getAdapterConfig(),
+            static::AXLEUS_KEY => $this->getAxleusSettings(),
+            'dependencies'     => $this->getDependencies(),
+            'templates'        => $this->getTemplates(),
         ];
     }
 
-    public function getAdapterConfig(): array
+    public function getAxleusSettings(): array
     {
         return [
-            Adapter\AdapterInterface::class => [],
+            Adapter\AdapterInterface::class => [
+                'host'      => '127.0.0.1',
+                'smtp_auth' => true,
+                'port'      => 25,
+                'username'  => '',
+                'password'  => '',
+                'from' => 'registration@masteringmezzio.com',
+            ],
         ];
     }
 

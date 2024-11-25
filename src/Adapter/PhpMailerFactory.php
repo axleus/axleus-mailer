@@ -14,12 +14,12 @@ final class PhpMailerFactory
     public function __invoke(ContainerInterface $container): PhpMailer
     {
         $config = $container->get('config');
-        if (empty($config[ConfigProvider::class][AdapterInterface::class])) {
+        if (empty($config[ConfigProvider::AXLEUS_KEY][AdapterInterface::class])) {
             throw new ServiceNotCreatedException(
                 'Service: ' . PhpMailer::class . ' could not be created. Missing configuration.'
             );
         }
-        $config = $config[ConfigProvider::class][AdapterInterface::class];
+        $config = $config[ConfigProvider::AXLEUS_KEY][AdapterInterface::class];
         $mailer = new BaseMailer(true); // enable exceptions
         //$mailer->isSMTP();
         $mailer->Host     = $config['host'];
