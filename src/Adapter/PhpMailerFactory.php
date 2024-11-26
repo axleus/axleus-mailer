@@ -13,7 +13,7 @@ final class PhpMailerFactory
 {
     public function __invoke(ContainerInterface $container): PhpMailer
     {
-        $config = $container->get('config')[ConfigProvider::AXLEUS_KEY][ConfigProvider::class];
+        $config = $container->get('config')[ConfigProvider::class];
         if (empty($config[AdapterInterface::class])) {
             throw new ServiceNotCreatedException(
                 'Service: ' . PhpMailer::class . ' could not be created. Missing configuration.'
