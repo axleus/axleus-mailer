@@ -14,7 +14,7 @@ class MailerMiddlewareFactory
     public function __invoke(ContainerInterface $container): MailerMiddleware
     {
         $config       = $container->get('config');
-        $mailSettings = $config[ConfigProvider::AXLEUS_KEY][ConfigProvider::class][AdapterInterface::class];
+        $mailSettings = $config[ConfigProvider::class][AdapterInterface::class];
         return new MailerMiddleware(
             $container->get(MailerInterface::class),
             $mailSettings
