@@ -11,13 +11,13 @@ class ConfigProvider implements ConfigProviderInterface
     public function __invoke(): array
     {
         return [
-            static::AXLEUS_KEY => [static::class => $this->getAxleusSettings()],
-            'dependencies'     => $this->getDependencies(),
-            'templates'        => $this->getTemplates(),
+            static::class  => $this->getAxleusConfig(),
+            'dependencies' => $this->getDependencies(),
+            'templates'    => $this->getTemplates(),
         ];
     }
 
-    public function getAxleusSettings(): array
+    public function getAxleusConfig(): array
     {
         return [
             Adapter\AdapterInterface::class => [
@@ -26,7 +26,7 @@ class ConfigProvider implements ConfigProviderInterface
                 'port'      => 25,
                 'username'  => '',
                 'password'  => '',
-                'from' => 'registration@example.com',
+                'from'      => 'registration@example.com',
             ],
         ];
     }
