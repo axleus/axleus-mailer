@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer\Event;
 
-use Laminas\EventManager\Event;
 use Mezzio\Authentication\UserInterface;
-use Webmozart\Assert\Assert;
+use Webware\CommandBus\Event\Event;
 
 // todo: check if still in use
 class MessageEvent extends Event
