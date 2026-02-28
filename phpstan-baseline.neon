@@ -1,2 +1,79 @@
 parameters:
 	ignoreErrors:
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: src/Adapter/PhpMailerFactory.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 7
+			path: src/Adapter/PhpMailerFactory.php
+
+		-
+			message: '#^Instantiated class Laminas\\ServiceManager\\Exception\\ServiceNotCreatedException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Adapter/PhpMailerFactory.php
+
+		-
+			message: '#^Throwing object of an unknown class Laminas\\ServiceManager\\Exception\\ServiceNotCreatedException\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Adapter/PhpMailerFactory.php
+
+		-
+			message: '#^Trait Axleus\\Mailer\\MailerAwareInterfaceTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/MailerAwareInterfaceTrait.php
+
+		-
+			message: '#^Call to method handle\(\) on an unknown class Psr\\Http\\Server\\RequestHandlerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Call to method withAttribute\(\) on an unknown class Psr\\Http\\Message\\ServerRequestInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Method Axleus\\Mailer\\Middleware\\MailerMiddleware\:\:process\(\) has invalid return type Psr\\Http\\Message\\ResponseInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Method Axleus\\Mailer\\Middleware\\MailerMiddleware\:\:process\(\) should return Psr\\Http\\Message\\ResponseInterface but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Parameter \$handler of method Axleus\\Mailer\\Middleware\\MailerMiddleware\:\:process\(\) has invalid type Psr\\Http\\Server\\RequestHandlerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Parameter \$request of method Axleus\\Mailer\\Middleware\\MailerMiddleware\:\:process\(\) has invalid type Psr\\Http\\Message\\ServerRequestInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Middleware/MailerMiddleware.php
+
+		-
+			message: '#^Cannot access offset ''Axleus\\\\Mailer\\\\Adapter\\\\AdapterInterface'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Middleware/MailerMiddlewareFactory.php

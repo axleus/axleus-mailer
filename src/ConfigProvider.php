@@ -2,15 +2,26 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer;
 
-use Webware\CommandBus\ConfigProvider as BusProvider;
 use Webware\CommandBus\CommandBusInterface;
+use Webware\CommandBus\ConfigProvider as BusProvider;
 
 use function class_exists;
 
-class ConfigProvider implements ConfigProvider
+class ConfigProvider
 {
+    /** @return array<string, mixed> */
     public function __invoke(): array
     {
         $deps = [
@@ -28,20 +39,26 @@ class ConfigProvider implements ConfigProvider
         return $deps;
     }
 
+    /** @return array<string, mixed> */
     public function getAxleusConfig(): array
     {
         return [
             Adapter\AdapterInterface::class => [
-                'host'      => '127.0.0.1',
-                'smtp_auth' => true,
-                'port'      => 25,
-                'username'  => '',
-                'password'  => '',
-                'from'      => 'registration@example.com',
+                'host'        => '127.0.0.1',
+                'smtp_auth'   => true,
+                'smtp_secure' => '',
+                'port'        => 25,
+                'username'    => '',
+                'password'    => '',
+                'from'        => 'registration@example.com',
+                'charset'     => 'UTF-8',
+                'encoding'    => 'base64',
+                'timeout'     => 30,
             ],
         ];
     }
 
+    /** @return array<string, mixed> */
     public function getDependencies(): array
     {
         $deps = [
@@ -52,7 +69,7 @@ class ConfigProvider implements ConfigProvider
             'factories' => [
                 Adapter\PhpMailer::class           => Adapter\PhpMailerFactory::class,
                 Mailer::class                      => MailerFactory::class,
-                Middleware\MailerMiddleware::class => Middleware\MailerMiddlewareFactory::class
+                Middleware\MailerMiddleware::class => Middleware\MailerMiddlewareFactory::class,
             ],
         ];
 
@@ -63,6 +80,7 @@ class ConfigProvider implements ConfigProvider
         return $deps;
     }
 
+    /** @return array<string, mixed> */
     public function getCommandMap(): array
     {
         return [
@@ -70,11 +88,12 @@ class ConfigProvider implements ConfigProvider
         ];
     }
 
+    /** @return array<string, mixed> */
     public function getTemplates(): array
     {
         return [
             'paths' => [
-                'mail'    => [__DIR__ . '/../templates/'],
+                'mail' => [__DIR__ . '/../templates/'],
             ],
         ];
     }

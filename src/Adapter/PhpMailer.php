@@ -2,80 +2,174 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer\Adapter;
 
+use Override;
 use PHPMailer\PHPMailer\PHPMailer as BaseMailer;
 
 final class PhpMailer implements AdapterInterface
 {
     public function __construct(
-        private BaseMailer $mailer
-    ) {
-    }
+        private BaseMailer $mailer,
+    ) {}
 
-    public function to(string $email, string $name = '', bool $clearPrevious = false): bool
+    #[Override]
+    public function to(string $email, string $name = ''): self
     {
-        if ($clearPrevious) {
-            $this->mailer->clearAddresses();
-        }
+        $this->mailer->addAddress($email, $name);
 
-        return $this->mailer->addAddress($email, $name);
+        return $this;
     }
 
-    public function from(string $email, $name = '', $auto = true): bool
+    #[Override]
+    public function from(string $email, string $name = ''): self
     {
-        return $this->mailer->setFrom($email, $name, $auto);
+        $this->mailer->setFrom($email, $name);
+
+        return $this;
     }
 
-    public function body(string $body): void
+    #[Override]
+    public function replyTo(string $email, string $name = ''): self
     {
-        $this->mailer->Body = $body;
+        $this->mailer->addReplyTo($email, $name);
+
+        return $this;
     }
 
-    public function altBody(string $altBody): void
+    #[Override]
+    public function cc(string $email, string $name = ''): self
     {
-        $this->mailer->AltBody = $altBody;
+        $this->mailer->addCC($email, $name);
+
+        return $this;
     }
 
-    public function subject(string $subject): void
+    #[Override]
+    public function bcc(string $email, string $name = ''): self
+    {
+        $this->mailer->addBCC($email, $name);
+
+        return $this;
+    }
+
+    #[Override]
+    public function subject(string $subject): self
     {
         $this->mailer->Subject = $subject;
+
+        return $this;
     }
 
-    public function cc(string $email, string $name = ''): bool
+    #[Override]
+    public function body(string $body): self
     {
-        return $this->mailer->addCC($email, $name);
+        $this->mailer->Body = $body;
+
+        return $this;
     }
 
-    public function bcc(string $email, string $name = ''): bool
+    #[Override]
+    public function altBody(string $altBody): self
     {
-        return $this->mailer->addBCC($email, $name);
+        $this->mailer->AltBody = $altBody;
+
+        return $this;
     }
 
-    public function isHtml(bool $flag = true): void
+    #[Override]
+    public function isHtml(bool $flag = true): self
     {
         $this->mailer->isHTML($flag);
+
+        return $this;
     }
 
-    public function isSmtp(bool $flag = true): void
+    #[Override]
+    public function charset(string $charset): self
     {
-        if ($flag) {
-            $this->mailer->isSMTP();
-        }
+        $this->mailer->CharSet = $charset;
+
+        return $this;
     }
 
-    public function getSubject(): ?string
+    #[Override]
+    public function encoding(string $encoding): self
     {
-        return $this->mailer->Subject;
+        $this->mailer->Encoding = $encoding;
+
+        return $this;
     }
 
-    public function getBody(): ?string
+    #[Override]
+    public function attach(string $path, string $name = '', string $mimeType = ''): self
     {
-        return $this->mailer->Body;
+        $this->mailer->addAttachment($path, $name, encoding: 'base64', type: $mimeType);
+
+        return $this;
     }
 
-    public function __call($name, $arguments)
+    #[Override]
+    public function attachFromString(string $content, string $name, string $mimeType = ''): self
     {
-        return $this->mailer->$name(...$arguments);
+        $this->mailer->addStringAttachment($content, $name, encoding: 'base64', type: $mimeType);
+
+        return $this;
+    }
+
+    #[Override]
+    public function addHeader(string $name, string $value): self
+    {
+        $this->mailer->addCustomHeader($name, $value);
+
+        return $this;
+    }
+
+    #[Override]
+    public function reset(): self
+    {
+        $this->mailer->clearAddresses();
+        $this->mailer->clearCCs();
+        $this->mailer->clearBCCs();
+        $this->mailer->clearReplyTos();
+        $this->mailer->clearAttachments();
+        $this->mailer->clearCustomHeaders();
+        $this->mailer->Subject = '';
+        $this->mailer->Body    = '';
+        $this->mailer->AltBody = '';
+
+        return $this;
+    }
+
+    #[Override]
+    public function isSmtp(): self
+    {
+        $this->mailer->isSMTP();
+
+        return $this;
+    }
+
+    #[Override]
+    public function isMail(): self
+    {
+        $this->mailer->isMail();
+
+        return $this;
+    }
+
+    #[Override]
+    public function send(): bool
+    {
+        return $this->mailer->send();
     }
 }

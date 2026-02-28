@@ -7,21 +7,24 @@
 ## Architecture Overview
 
 ```
-MailerInterface / Mailer          — Core mailer; delegates sending to an adapter
-Adapter\AdapterInterface          — Contract every mail driver must fulfill
-Adapter\PhpMailer                 — Adapter wrapping phpmailer/phpmailer
+MailerInterface / Mailer          — Core mailer; holds an adapter and delegates send() to it
+Adapter\MessageInterface          — Fluent builder contract for message composition (to/from/subject/body/attach/etc.)
+Adapter\AdapterInterface          — Extends MessageInterface; adds transport config (isSmtp/isMail) and send(): bool
+Adapter\PhpMailer                 — Adapter wrapping phpmailer/phpmailer; implements AdapterInterface
 Middleware\MailerMiddleware        — PSR-15 middleware; injects Mailer as a request attribute
 MailerAwareInterface / Trait      — Interface + trait for services that need the mailer injected
 MailerAwareDelegator              — Laminas delegator that auto-injects MailerInterface into MailerAwareInterface services
 CommandBus\SendEmailCommand       — Immutable command object (to / subject / body)
-CommandBus\SendEmailCommandHandler— Handles the command; returns a CommandResult
-Event\MessageEvent                — Event wrapping an email message (uses webware/commandbus-event)
+CommandBus\SendEmailCommandHandler— Handles the command; configures the adapter then calls send()
+Event\MessageEvent                — Event wrapping an email message (uses webware/commandbus-event) — in progress
 ConfigProvider                    — Laminas/Mezzio config provider wiring all services
 ```
 
 ## Key Design Patterns
 
-- **Adapter pattern**: `MailerInterface::send()` delegates to `Adapter\AdapterInterface`. All concrete mailer libraries are wrapped in an adapter.
+- **Interface split**: `MessageInterface` owns all message-building methods (to/from/cc/bcc/replyTo/subject/body/altBody/attach/headers/charset/encoding/reset). `AdapterInterface` extends `MessageInterface` and adds transport config (`isSmtp()`/`isMail()`) and `send(): bool`. Every adapter must satisfy both contracts.
+- **Fluent builder**: All `MessageInterface` and `AdapterInterface` methods return `self`, enabling chained calls: `$adapter->to(...)->subject(...)->body(...)->send()`.
+- **Adapter pattern**: `MailerInterface::send()` delegates to the internally held `Adapter\AdapterInterface`. All concrete mailer libraries are wrapped in an adapter.
 - **PSR-11 Factories**: Every service has a matching `*Factory` class that reads from the container. Factories are registered in `ConfigProvider::getDependencies()`.
 - **Laminas Service Manager aliases**: `AdapterInterface::class` is aliased to `PhpMailer::class` (and `MailerInterface::class` to `Mailer::class`), making the concrete implementation swappable via configuration.
 - **Delegator pattern**: `MailerAwareDelegator` detects whether a resolved service implements `MailerAwareInterface` and injects the mailer automatically — no manual wiring is required.
@@ -34,14 +37,20 @@ Top-level config key is `ConfigProvider::class`. Adapter settings live under:
 
 ```php
 $config[ConfigProvider::class][AdapterInterface::class] = [
-    'host'      => '127.0.0.1',
-    'smtp_auth' => true,
-    'port'      => 25,
-    'username'  => '',
-    'password'  => '',
-    'from'      => 'registration@example.com',
+    'host'        => '127.0.0.1',
+    'smtp_auth'   => true,
+    'smtp_secure' => '',       // 'tls' or 'ssl'
+    'port'        => 25,
+    'username'    => '',
+    'password'    => '',
+    'from'        => 'registration@example.com',
+    'charset'     => 'UTF-8',
+    'encoding'    => 'base64',
+    'timeout'     => 30,
 ];
 ```
+
+All adapter config lives under the single `AdapterInterface::class` key. To swap the active adapter, change the alias in `ConfigProvider::getDependencies()` — do not add a new config key.
 
 ## Coding Conventions
 
@@ -56,9 +65,10 @@ $config[ConfigProvider::class][AdapterInterface::class] = [
 
 ## Adding a New Adapter
 
-1. Create `src/Adapter/YourAdapter.php` implementing `Adapter\AdapterInterface`.
-2. Create `src/Adapter/YourAdapterFactory.php` — read config from `$container->get('config')[ConfigProvider::class][AdapterInterface::class]`.
-3. Register in `ConfigProvider::getDependencies()`:
+1. Create `src/Adapter/YourAdapter.php` implementing `Adapter\AdapterInterface` (which extends `MessageInterface`). All builder methods must return `self`; `send()` must return `bool`.
+2. Add `#[Override]` to every method that implements the interface.
+3. Create `src/Adapter/YourAdapterFactory.php` — read config from `$container->get('config')[ConfigProvider::class][AdapterInterface::class]`.
+4. Register in `ConfigProvider::getDependencies()`:
    - Add a factory entry for `YourAdapter::class`.
    - Update the alias `AdapterInterface::class => YourAdapter::class`.
 
