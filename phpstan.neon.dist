@@ -5,13 +5,13 @@ parameters:
     paths:
         - src
         - test
-    universalObjectCratesClasses:
-        - Laminas\Stdlib\ArrayObject
     stubFiles:
-        - stubs/Laminas/ServiceManager/Factory/AbstractFactoryInterface.stub
-        - stubs/Laminas/ServiceManager/Factory/DelegatorFactoryInterface.stub
-        - stubs/Laminas/ServiceManager/Factory/FactoryInterface.stub
-        - stubs/Laminas/ServiceManager/Factory/InvokableFactory.stub
-        - stubs/Laminas/ServiceManager/Initializer/InitializerInterface.stub
-        - stubs/Psr/Container/ContainerInterface.stub
+        - stubs/Laminas/ServiceManager/Factory/AbstractFactoryInterface.php.stub
+        - stubs/Laminas/ServiceManager/Factory/DelegatorFactoryInterface.php.stub
+        - stubs/Laminas/ServiceManager/Factory/FactoryInterface.php.stub
+        - stubs/Laminas/ServiceManager/Factory/InvokableFactory.php.stub
+        - stubs/Laminas/ServiceManager/Initializer/InitializerInterface.php.stub
+        - stubs/Psr/Container/ContainerInterface.php.stub
     treatPhpDocTypesAsCertain: false
+    excludePaths:
+        - src/Middleware/MailerMiddleware.php

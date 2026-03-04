@@ -2,18 +2,23 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer\Adapter;
 
-interface AdapterInterface
+interface AdapterInterface extends MessageInterface
 {
-    public function to(string $email, string $name);
-    public function from(string $email);
-    public function body(string $body);
-    public function altBody(string $altBody);
-    public function subject(string $subject);
-    public function cc(string $email);
-    public function bcc(string $email);
-    public function isHtml(bool $flag = true);
-    public function isSmtp(bool $flag = false);
-    //public function send();
+    public function isSmtp(): self;
+
+    public function isMail(): self;
+
+    public function send(): bool;
 }

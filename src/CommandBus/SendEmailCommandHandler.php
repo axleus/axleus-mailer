@@ -2,34 +2,51 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer\CommandBus;
 
 use Axleus\Mailer\MailerInterface;
+use Exception;
 use Override;
-use Webware\CommandBus\Command\CommandResultInterface;
-use Webware\CommandBus\CommandHandlerInterface;
+use RuntimeException;
 use Webware\CommandBus\Command\CommandResult;
+use Webware\CommandBus\Command\CommandResultInterface;
 use Webware\CommandBus\Command\CommandStatus;
+use Webware\CommandBus\CommandHandlerInterface;
 use Webware\CommandBus\CommandInterface;
 
 final readonly class SendEmailCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private MailerInterface $mailer
-    ) {
-    }
+        private MailerInterface $mailer,
+    ) {}
 
     /**
-     * 
-     * @param CommandInterface&SendEmailCommand $command 
-     * @return CommandResultInterface 
+     * @param CommandInterface&SendEmailCommand $command
      */
     #[Override]
     public function handle(CommandInterface $command): CommandResultInterface
     {
         try {
-            $this->mailer->send($command->getBody());
-        } catch (\Throwable $e) { // track down the specific exception thrown by the mailer adapter and catch that instead of Throwable
+            $adapter = $this->mailer->getAdapter();
+            if ($adapter === null) {
+                throw new RuntimeException('No adapter configured on Mailer instance.');
+            }
+            $adapter
+                ->to($command->getTo())
+                ->subject($command->getSubject())
+                ->body($command->getBody());
+            $this->mailer->send();
+        } catch (Exception $e) { // track down the specific exception thrown by the mailer adapter and catch that instead of Exception
             return new CommandResult(
                 $command,
                 CommandStatus::Failure,

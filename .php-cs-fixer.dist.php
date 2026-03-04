@@ -13,6 +13,7 @@ $composerData = json_decode(
     true,
     512,
 );
+$composerData['name'] = 'Axleus Mailer';
 
 return (new Config())
     ->registerCustomRuleSets([
@@ -21,6 +22,7 @@ return (new Config())
             packageName: $composerData['name'],
             authorName: $composerData['authors'][0]['name'],
             authorEmail: $composerData['authors'][0]['email'],
+            minYear: '2025',
         ),
     ])
     ->setParallelConfig(ParallelConfigFactory::detect()) // @TODO 4.0 no need to call this manually

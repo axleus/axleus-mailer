@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer\Middleware;
 
 use Axleus\Mailer\MailerInterface;
@@ -12,19 +22,25 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class MailerMiddleware implements MiddlewareInterface
 {
-    public final const TEMPLATE_KEY     = 'message_templates';
-    public final const FROM_ADDRESS_KEY = 'from';
+    final public const TEMPLATE_KEY = 'message_templates';
 
+    final public const FROM_ADDRESS_KEY = 'from';
+
+    /**
+     * @param array<string, mixed> $config
+     */
     public function __construct(
         private MailerInterface $mailer,
-        private array $config
-    ){
-    }
+        private array $config,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $adapter = $this->mailer->getAdapter();
-        $adapter->from($this->config[static::FROM_ADDRESS_KEY]);
+        if ($adapter !== null) {
+            $adapter->from((string) $this->config[static::FROM_ADDRESS_KEY]);
+        }
+
         return $handler->handle($request->withAttribute(MailerInterface::class, $this->mailer));
     }
 }

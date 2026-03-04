@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the Axleus Mailer package.
+ *
+ * Copyright (c) 2025-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Axleus\Mailer\Event;
 
-use Mezzio\Authentication\UserInterface;
 use Webware\CommandBus\Event\Event;
 
-// todo: check if still in use
+// todo: determine whether this event is still needed and flesh out accordingly
 class MessageEvent extends Event
 {
-    public final const EVENT_EMAIL_MESSAGE = 'emailMessage';
-
-    public function setTarget($target)
-    {
-        assert::isInstanceOf(
-            $target,
-            UserInterface::class,
-            '$target must be an instance of: ' . UserInterface::class
-        );
-        $this->target = $target;
-    }
+    final public const EVENT_EMAIL_MESSAGE = 'emailMessage';
 }
