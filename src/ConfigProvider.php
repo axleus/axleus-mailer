@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer;
 
+use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\MailerInterface;
 use Webware\CommandBus\CommandBusInterface;
 use Webware\CommandBus\ConfigProvider as BusProvider;
 
@@ -24,36 +26,14 @@ class ConfigProvider
     /** @return array<string, mixed> */
     public function __invoke(): array
     {
-        $deps = [
-            static::class  => $this->getAxleusConfig(),
+        return [
             'dependencies' => $this->getDependencies(),
             'templates'    => $this->getTemplates(),
-        ];
-
-        if (class_exists(CommandBusInterface::class)) {
-            $deps[CommandBusInterface::class] = [
+            CommandBusInterface::class => [
                 BusProvider::COMMAND_MAP_KEY => $this->getCommandMap(),
-            ];
-        }
-
-        return $deps;
-    }
-
-    /** @return array<string, mixed> */
-    public function getAxleusConfig(): array
-    {
-        return [
-            Adapter\AdapterInterface::class => [
-                'host'        => '127.0.0.1',
-                'smtp_auth'   => true,
-                'smtp_secure' => '',
-                'port'        => 25,
-                'username'    => '',
-                'password'    => '',
-                'from'        => 'registration@example.com',
-                'charset'     => 'UTF-8',
-                'encoding'    => 'base64',
-                'timeout'     => 30,
+            ],
+            MailerInterface::class => [
+                AdapterInterface::class => $this->getAdapterConfig(),
             ],
         ];
     }
@@ -61,23 +41,18 @@ class ConfigProvider
     /** @return array<string, mixed> */
     public function getDependencies(): array
     {
-        $deps = [
+        return [
             'aliases'   => [
                 Adapter\AdapterInterface::class => Adapter\PhpMailer::class, // required mapping
                 MailerInterface::class          => Mailer::class,
             ],
             'factories' => [
-                Adapter\PhpMailer::class           => Adapter\PhpMailerFactory::class,
-                Mailer::class                      => MailerFactory::class,
+                Adapter\PhpMailer::class           => Container\PhpMailerFactory::class,
+                CommandBus\SendEmailCommandHandler::class => CommandBus\SendEmailCommandHandlerFactory::class,
+                Mailer::class                      => Container\MailerFactory::class,
                 Middleware\MailerMiddleware::class => Middleware\MailerMiddlewareFactory::class,
             ],
         ];
-
-        if (class_exists(CommandBusInterface::class)) {
-            $deps['factories'][CommandBus\SendEmailCommandHandler::class] = CommandBus\SendEmailCommandHandlerFactory::class;
-        }
-
-        return $deps;
     }
 
     /** @return array<string, mixed> */
@@ -95,6 +70,15 @@ class ConfigProvider
             'paths' => [
                 'mail' => [__DIR__ . '/../templates/'],
             ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    public function getAdapterConfig(): array
+    {
+        return [
+            'enableExceptions' => true,
+            'useSmtp'          => false,
         ];
     }
 }

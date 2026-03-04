@@ -33,10 +33,10 @@ ConfigProvider                    — Laminas/Mezzio config provider wiring all 
 
 ## Configuration
 
-Top-level config key is `ConfigProvider::class`. Adapter settings live under:
+Top-level config key is `[MailerInterface::class][AdapterInterface::class]`. Adapter settings live under:
 
 ```php
-$config[ConfigProvider::class][AdapterInterface::class] = [
+$config[MailerInterface::class][AdapterInterface::class] = [
     'host'        => '127.0.0.1',
     'smtp_auth'   => true,
     'smtp_secure' => '',       // 'tls' or 'ssl'

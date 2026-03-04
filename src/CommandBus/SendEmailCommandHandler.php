@@ -15,9 +15,9 @@ declare(strict_types=1);
 namespace Axleus\Mailer\CommandBus;
 
 use Axleus\Mailer\MailerInterface;
+use Exception;
 use Override;
 use RuntimeException;
-use Throwable;
 use Webware\CommandBus\Command\CommandResult;
 use Webware\CommandBus\Command\CommandResultInterface;
 use Webware\CommandBus\Command\CommandStatus;
@@ -46,7 +46,7 @@ final readonly class SendEmailCommandHandler implements CommandHandlerInterface
                 ->subject($command->getSubject())
                 ->body($command->getBody());
             $this->mailer->send();
-        } catch (Throwable $e) { // track down the specific exception thrown by the mailer adapter and catch that instead of Throwable
+        } catch (Exception $e) { // track down the specific exception thrown by the mailer adapter and catch that instead of Exception
             return new CommandResult(
                 $command,
                 CommandStatus::Failure,

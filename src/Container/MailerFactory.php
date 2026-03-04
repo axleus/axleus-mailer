@@ -12,16 +12,19 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Axleus\Mailer;
+namespace Axleus\Mailer\Container;
 
+use Axleus\Mailer\Mailer;
+use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\MailerInterface;
 use Psr\Container\ContainerInterface;
 
 final class MailerFactory
 {
-    public function __invoke(ContainerInterface $container): Mailer
+    public function __invoke(ContainerInterface $container): MailerInterface
     {
-        /** @var Adapter\AdapterInterface $adapter */
-        $adapter = $container->get(Adapter\AdapterInterface::class);
+        /** @var AdapterInterface $adapter */
+        $adapter = $container->get(AdapterInterface::class);
 
         return new Mailer($adapter);
     }

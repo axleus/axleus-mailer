@@ -17,7 +17,7 @@ namespace Axleus\Mailer;
 use Override;
 use RuntimeException;
 
-final class Mailer implements MailerInterface
+final readonly class Mailer implements MailerInterface
 {
     public function __construct(
         private ?Adapter\AdapterInterface $adapter,

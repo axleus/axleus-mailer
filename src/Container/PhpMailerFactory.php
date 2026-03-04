@@ -12,29 +12,42 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Axleus\Mailer\Adapter;
+namespace Axleus\Mailer\Container;
 
-use Axleus\Mailer\ConfigProvider;
+use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\Adapter\PhpMailer;
+use Axleus\Mailer\MailerInterface;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use PHPMailer\PHPMailer\PHPMailer as BaseMailer;
 use Psr\Container\ContainerInterface;
 
 final class PhpMailerFactory
 {
-    public function __invoke(ContainerInterface $container): PhpMailer
+    public function __invoke(ContainerInterface $container): AdapterInterface&PhpMailer
     {
         /** @var array<string, mixed> $appConfig */
         $appConfig = $container->get('config');
 
         /** @var array<string, mixed> $providerConfig */
-        $providerConfig = $appConfig[ConfigProvider::class];
+        $providerConfig = $appConfig[MailerInterface::class];
         if (empty($providerConfig[AdapterInterface::class])) {
             throw new ServiceNotCreatedException('Service: ' . PhpMailer::class . ' could not be created. Missing configuration.');
         }
 
         /** @var array<string, mixed> $config */
-        $config           = $providerConfig[AdapterInterface::class];
-        $mailer           = new BaseMailer(true); // enable exceptions
+        $config = $providerConfig[AdapterInterface::class];
+        $mailer = new BaseMailer($config['enableExceptions'] ?? true); // enable exceptions
+
+        if (isset($config['useSmtp']) && (bool) $config['useSmtp'] === true) {
+            $this->configureSmtp($mailer, $config);
+        }
+        
+        return new PhpMailer($mailer);
+    }
+
+    private function configureSmtp(BaseMailer $mailer, array $config): void
+    {
+        $mailer->isSMTP();
         $mailer->Host     = (string) $config['host'];
         $mailer->Port     = (int) $config['port'];
         $mailer->SMTPAuth = (bool) $config['smtp_auth'];
@@ -48,14 +61,8 @@ final class PhpMailerFactory
             $mailer->SMTPSecure = (string) $config['smtp_secure'];
         }
 
-        if ($config['smtp_auth']) {
-            $mailer->isSMTP();
-        }
-
         if (! empty($config['from'])) {
             $mailer->setFrom((string) $config['from']);
         }
-
-        return new PhpMailer($mailer);
     }
 }

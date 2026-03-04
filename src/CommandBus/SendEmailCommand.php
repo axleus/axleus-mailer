@@ -14,14 +14,19 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer\CommandBus;
 
+use Axleus\Mailer\Event\MessageEvent;
+use Override;
 use Webware\CommandBus\CommandInterface;
+use Webware\CommandBus\Event\EventAwareInterface;
+use Webware\CommandBus\Event\EventInterface;
 
-final readonly class SendEmailCommand implements CommandInterface
+final readonly class SendEmailCommand implements CommandInterface, EventAwareInterface
 {
     public function __construct(
         private string $to,
         private string $subject,
         private string $body,
+        private MessageEvent $event
     ) {}
 
     public function getTo(): string
@@ -38,4 +43,13 @@ final readonly class SendEmailCommand implements CommandInterface
     {
         return $this->body;
     }
+
+    #[Override]
+    public function getEvent(): MessageEvent
+    {
+        return $this->event;
+    }
+
+    #[Override]
+    public function setEvent(EventInterface|MessageEvent $event): void {}
 }
