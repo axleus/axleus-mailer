@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Axleus\Mailer\Container;
 
 use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\Adapter\MessageInterface;
 use Axleus\Mailer\Adapter\PhpMailer;
-use Axleus\Mailer\MailerInterface;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use PHPMailer\PHPMailer\PHPMailer as BaseMailer;
 use Psr\Container\ContainerInterface;
@@ -28,14 +28,14 @@ final class PhpMailerFactory
         /** @var array<string, mixed> $appConfig */
         $appConfig = $container->get('config');
 
-        /** @var array<string, mixed> $providerConfig */
-        $providerConfig = $appConfig[MailerInterface::class];
-        if (empty($providerConfig[AdapterInterface::class])) {
+        /** @var array<string, mixed> $adapterConfig */
+        $adapterConfig = $appConfig[MessageInterface::class];
+        if (empty($adapterConfig[AdapterInterface::class])) {
             throw new ServiceNotCreatedException('Service: ' . PhpMailer::class . ' could not be created. Missing configuration.');
         }
 
         /** @var array<string, mixed> $config */
-        $config = $providerConfig[AdapterInterface::class];
+        $config = $adapterConfig[AdapterInterface::class];
         $mailer = new BaseMailer($config['enableExceptions'] ?? true); // enable exceptions
 
         if (isset($config['useSmtp']) && (bool) $config['useSmtp'] === true) {
@@ -45,24 +45,24 @@ final class PhpMailerFactory
         return new PhpMailer($mailer);
     }
 
-    private function configureSmtp(BaseMailer $mailer, array $config): void
+    private function configureSmtp(BaseMailer $mailer, array $messageConfig): void
     {
         $mailer->isSMTP();
-        $mailer->Host     = (string) $config['host'];
-        $mailer->Port     = (int) $config['port'];
-        $mailer->SMTPAuth = (bool) $config['smtp_auth'];
-        $mailer->Username = (string) $config['username'];
-        $mailer->Password = (string) $config['password'];
-        $mailer->CharSet  = (string) ($config['charset'] ?? 'UTF-8');
-        $mailer->Encoding = (string) ($config['encoding'] ?? 'base64');
-        $mailer->Timeout  = (int) ($config['timeout'] ?? 30);
+        $mailer->Host     = (string) $messageConfig['host'];
+        $mailer->Port     = (int) $messageConfig['port'];
+        $mailer->SMTPAuth = (bool) $messageConfig['smtp_auth'];
+        $mailer->Username = (string) $messageConfig['username'];
+        $mailer->Password = (string) $messageConfig['password'];
+        $mailer->CharSet  = (string) ($messageConfig['charset'] ?? 'UTF-8');
+        $mailer->Encoding = (string) ($messageConfig['encoding'] ?? 'base64');
+        $mailer->Timeout  = (int) ($messageConfig['timeout'] ?? 30);
 
-        if (! empty($config['smtp_secure'])) {
-            $mailer->SMTPSecure = (string) $config['smtp_secure'];
+        if (! empty($messageConfig['smtp_secure'])) {
+            $mailer->SMTPSecure = (string) $messageConfig['smtp_secure'];
         }
 
-        if (! empty($config['from'])) {
-            $mailer->setFrom((string) $config['from']);
+        if (! empty($messageConfig['from'])) {
+            $mailer->setFrom((string) $messageConfig['from']);
         }
     }
 }
