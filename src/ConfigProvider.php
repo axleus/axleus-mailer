@@ -16,25 +16,22 @@ namespace Axleus\Mailer;
 
 use Axleus\Mailer\Adapter\AdapterInterface;
 use Axleus\Mailer\Adapter\MessageInterface;
-use Axleus\Mailer\MailerInterface;
 use Webware\CommandBus\CommandBusInterface;
 use Webware\CommandBus\ConfigProvider as BusProvider;
 
-use function class_exists;
-
-class ConfigProvider
+final readonly class ConfigProvider
 {
     /** @return array<string, mixed> */
     public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates'    => $this->getTemplates(),
+            'dependencies'             => $this->getDependencies(),
+            'templates'                => $this->getTemplates(),
             CommandBusInterface::class => [
                 BusProvider::COMMAND_MAP_KEY => $this->getCommandMap(),
             ],
-            AdapterInterface::class => $this->getAdapterConfig(),
-            MessageInterface::class => $this->getMessageConfig(),
+            AdapterInterface::class    => $this->getAdapterConfig(),
+            MessageInterface::class    => $this->getMessageConfig(),
         ];
     }
 
@@ -43,14 +40,14 @@ class ConfigProvider
     {
         return [
             'aliases'   => [
-                Adapter\AdapterInterface::class => Adapter\PhpMailer::class, // required mapping
-                MailerInterface::class          => Mailer::class,
+                AdapterInterface::class => Adapter\PhpMailer::class, // required mapping
+                MailerInterface::class  => Mailer::class,
             ],
             'factories' => [
-                Adapter\PhpMailer::class           => Container\PhpMailerFactory::class,
+                Adapter\PhpMailer::class                  => Container\PhpMailerFactory::class,
                 CommandBus\SendEmailCommandHandler::class => CommandBus\SendEmailCommandHandlerFactory::class,
-                Mailer::class                      => Container\MailerFactory::class,
-                Middleware\MailerMiddleware::class => Middleware\MailerMiddlewareFactory::class,
+                Mailer::class                             => Container\MailerFactory::class,
+                Middleware\MailerMiddleware::class        => Middleware\MailerMiddlewareFactory::class,
             ],
         ];
     }
@@ -82,6 +79,7 @@ class ConfigProvider
         ];
     }
 
+    /** @return array<string, mixed> */
     public function getMessageConfig(): array
     {
         return [];

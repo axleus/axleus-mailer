@@ -27,14 +27,14 @@ final readonly class SendEmailCommand implements CommandInterface, EventAwareInt
         private string $from,
         private string $subject,
         private string $body,
-        private MessageEvent $event
+        private MessageEvent $event,
     ) {}
 
     public function getTo(): string
     {
         return $this->to;
     }
-    
+
     public function getFrom(): string
     {
         return $this->from;
