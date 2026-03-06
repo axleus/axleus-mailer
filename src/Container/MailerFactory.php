@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Axleus\Mailer\Container;
 
-use Axleus\Mailer\Mailer;
 use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\Mailer;
 use Axleus\Mailer\MailerInterface;
 use Psr\Container\ContainerInterface;
 
