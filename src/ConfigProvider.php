@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Axleus\Mailer;
 
 use Axleus\Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\Adapter\MessageInterface;
 use Axleus\Mailer\MailerInterface;
 use Webware\CommandBus\CommandBusInterface;
 use Webware\CommandBus\ConfigProvider as BusProvider;
@@ -32,9 +33,8 @@ class ConfigProvider
             CommandBusInterface::class => [
                 BusProvider::COMMAND_MAP_KEY => $this->getCommandMap(),
             ],
-            MailerInterface::class => [
-                AdapterInterface::class => $this->getAdapterConfig(),
-            ],
+            AdapterInterface::class => $this->getAdapterConfig(),
+            MessageInterface::class => $this->getMessageConfig(),
         ];
     }
 
@@ -80,5 +80,10 @@ class ConfigProvider
             'enableExceptions' => true,
             'useSmtp'          => false,
         ];
+    }
+
+    public function getMessageConfig(): array
+    {
+        return [];
     }
 }
