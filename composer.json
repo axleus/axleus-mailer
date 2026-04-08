@@ -38,7 +38,7 @@
         "psr/http-server-middleware": "^1.0",
         "roave/security-advisories": "dev-master",
         "webware/coding-standard": "^0.1.0",
-        "webware/command-bus": "^0.5.0",
+        "webware/command-bus": "0.4.0",
         "webware/commandbus-event": "^0.1.0"
     },
     "extra": {
